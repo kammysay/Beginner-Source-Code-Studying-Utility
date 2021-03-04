@@ -6,3 +6,4 @@ ReSolve/It/RIMainFrame.java
  ReSolve.It.RIMainFrame$2
  ReSolve.It.RIMainFrame$3
  ReSolve.It.RIMainFrame$4
+ ReSolve.It.RIMainFrame$5

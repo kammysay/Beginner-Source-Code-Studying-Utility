@@ -4,10 +4,14 @@ package ReSolve.It;
  * @author skuch
  */
 
+
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.nio.file.Path;
 import java.nio.file.Files;
+import java.io.BufferedReader;
+import java.util.TreeMap;
 
 public class RIMainFrame extends javax.swing.JFrame {
 
@@ -30,13 +34,15 @@ public class RIMainFrame extends javax.swing.JFrame {
         fileChooser = new javax.swing.JFileChooser();
         jScrollPane3 = new javax.swing.JScrollPane();
         codeEditorPane = new javax.swing.JEditorPane();
-        methodsLabel = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        methodsList = new javax.swing.JList<>();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        outputText = new javax.swing.JTextArea();
+        originalOutputLabel = new javax.swing.JLabel();
         outputLabel = new javax.swing.JLabel();
         fileLocationLabel = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        outputText1 = new javax.swing.JTextArea();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        orginalOutputTextArea = new javax.swing.JTextArea();
+        showOriginalCodeButton = new javax.swing.JButton();
+        showSkeletonCodeButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         openFile = new javax.swing.JMenuItem();
@@ -49,23 +55,33 @@ public class RIMainFrame extends javax.swing.JFrame {
         codeEditorPane.setFont(new java.awt.Font("Consolas", 0, 12)); // NOI18N
         jScrollPane3.setViewportView(codeEditorPane);
 
-        methodsLabel.setFont(new java.awt.Font("Segoe UI Emoji", 0, 24)); // NOI18N
-        methodsLabel.setText("Methods");
-
-        methodsList.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        methodsList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane1.setViewportView(methodsList);
-
-        outputText.setColumns(20);
-        outputText.setRows(5);
-        jScrollPane2.setViewportView(outputText);
+        originalOutputLabel.setFont(new java.awt.Font("Segoe UI Emoji", 0, 24)); // NOI18N
+        originalOutputLabel.setText("Original Output");
 
         outputLabel.setFont(new java.awt.Font("Segoe UI Emoji", 0, 24)); // NOI18N
         outputLabel.setText("Output");
+
+        outputText1.setColumns(20);
+        outputText1.setRows(5);
+        jScrollPane4.setViewportView(outputText1);
+
+        orginalOutputTextArea.setColumns(20);
+        orginalOutputTextArea.setRows(5);
+        jScrollPane5.setViewportView(orginalOutputTextArea);
+
+        showOriginalCodeButton.setText("Show Original Code");
+        showOriginalCodeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showOriginalCodeButtonActionPerformed(evt);
+            }
+        });
+
+        showSkeletonCodeButton.setText("Show Skeleton Code");
+        showSkeletonCodeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showSkeletonCodeButtonActionPerformed(evt);
+            }
+        });
 
         jMenu1.setText("File");
 
@@ -99,16 +115,27 @@ public class RIMainFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(41, 41, 41)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(fileLocationLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE))
-                .addGap(50, 50, 50)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(methodsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jScrollPane1)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE))
-                    .addComponent(outputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(41, 41, 41))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(showOriginalCodeButton)
+                        .addGap(18, 18, 18)
+                        .addComponent(showSkeletonCodeButton)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(fileLocationLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(121, 121, 121))
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE))
+                        .addGap(50, 50, 50)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                            .addComponent(jScrollPane5)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(outputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(originalOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE)))))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -118,20 +145,25 @@ public class RIMainFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(methodsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(originalOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
-                        .addGap(26, 26, 26)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(outputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE))
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE))
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE))
-                .addGap(61, 61, 61))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(showOriginalCodeButton)
+                    .addComponent(showSkeletonCodeButton))
+                .addGap(33, 33, 33))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    //Can currently only accept .java file types D:
     private void openFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openFileActionPerformed
         // TODO add your handling code here:
         int returnVal = fileChooser.showOpenDialog(this);
@@ -139,20 +171,46 @@ public class RIMainFrame extends javax.swing.JFrame {
         {
             //C:\Users\skuch\Documents\NetBeansProjects\ReSolve-It\src\main\java\ReSolve\It\source-copies
             File file = fileChooser.getSelectedFile();
-            File fileCopy = new File("src\\main\\java\\ReSolve\\It\\source-copies\\" + file.getName());
+            File fileCopy = new File("src\\main\\java\\ReSolve\\It\\source-copies\\source.java");
             copyPath = fileCopy.toPath();
             try
             {   //This is where we choose what to do with the file (e.g. display in text area, store location)
                 Files.copy(file.toPath(), fileCopy.toPath());
+                sourceCode = fileCopy;
                 fileLocation = file.getAbsolutePath(); //Saves file directory as a string
                 fileLocationLabel.setText(fileLocation); //Sets the fileLocation label to the file's location (obv)
-                codeEditorPane.read(new FileReader(fileCopy.getAbsolutePath()), null); //Opens the file in the text editor pane
+                removeTextFromFunctions(fileCopy); //Hides function text and displays the code
             }catch(Exception e){
                codeEditorPane.setText("ERROR: \n" + e);
             }
         }
     }//GEN-LAST:event_openFileActionPerformed
 
+    private void removeTextFromFunctions(File file)throws Exception{
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        File sourceCopy = new File("src\\main\\java\\ReSolve\\It\\source-copies\\sourceCopy.java" );
+        FileWriter fw = new FileWriter(sourceCopy);
+        
+        //Copying the contents of file to sourceCopy, displaying sourceCopy
+        int lineNum = 0;
+        int bracketNum = -1;
+        String line;
+        while( (line=br.readLine()) != null )
+        {
+            if( line.contains("}") ) bracketNum--;
+            if( bracketNum < 1) fw.write(line + "\n");
+            if( bracketNum >= 1 ){
+                fw.write("\n");
+            }
+            if( line.contains("{") ) bracketNum++;
+            lineNum++;
+        }
+        fw.flush();
+        fw.close();
+        sourceCodeCopy = sourceCopy;
+        codeEditorPane.read(new FileReader(sourceCopy.getAbsolutePath()), null);
+    }
+    
     private void ExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExitActionPerformed
         try{
             Files.delete(copyPath);
@@ -161,9 +219,47 @@ public class RIMainFrame extends javax.swing.JFrame {
         }
         System.exit(0);
     }//GEN-LAST:event_ExitActionPerformed
+
+    private void showOriginalCodeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showOriginalCodeButtonActionPerformed
+        //If the skeleton code is currently in the editor, then switch to source code
+        if(fileCurrentlyInEditor == 1){
+            //Saves the code currently in the editor (because it is the skeleton code the user is writing
+            //Opens the source code
+            try{
+                FileWriter fw = new FileWriter(sourceCodeCopy.getAbsolutePath());
+                codeEditorPane.write(fw);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            try{
+                codeEditorPane.read(new FileReader(sourceCode.getAbsolutePath()), null);
+                fileCurrentlyInEditor = 0;
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_showOriginalCodeButtonActionPerformed
+
+    private void showSkeletonCodeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showSkeletonCodeButtonActionPerformed
+        /* If the file currently in editor is the skeleton code, we do not want to reopen it,
+           would cause us to lose work */
+        if(fileCurrentlyInEditor == 0){
+            //Does NOT save the code currently in the editor (because it is currently the source code)
+            try{
+                codeEditorPane.read(new FileReader(sourceCodeCopy.getAbsolutePath()), null);
+                fileCurrentlyInEditor = 1;
+            }catch(Exception e){
+                //Todo: Handle these exceptions better :)
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_showSkeletonCodeButtonActionPerformed
     
     /*private void clearSourceCopies()
     {
+        //Need to delete all files copied at the end of execution, else
+        //could crash program on next startup
+        
         copyPath.
         for( File file: copyLocation.) 
             
@@ -173,7 +269,7 @@ public class RIMainFrame extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String args[]){
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -205,9 +301,10 @@ public class RIMainFrame extends javax.swing.JFrame {
         });
     }
     
-    //My variables
+    //Global variables
+    private File sourceCode, sourceCodeCopy;
     private String fileLocation;
-    private String copyLocation = "src\\main\\java\\ReSolve\\It\\source-copies\\";
+    private int fileCurrentlyInEditor = 0; //0 = Source Code, or nothing
     private Path copyPath;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -218,13 +315,15 @@ public class RIMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JLabel methodsLabel;
-    private javax.swing.JList<String> methodsList;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JMenuItem openFile;
+    private javax.swing.JTextArea orginalOutputTextArea;
+    private javax.swing.JLabel originalOutputLabel;
     private javax.swing.JLabel outputLabel;
-    private javax.swing.JTextArea outputText;
+    private javax.swing.JTextArea outputText1;
+    private javax.swing.JButton showOriginalCodeButton;
+    private javax.swing.JButton showSkeletonCodeButton;
     // End of variables declaration//GEN-END:variables
 }
