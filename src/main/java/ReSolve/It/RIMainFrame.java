@@ -5,13 +5,12 @@ package ReSolve.It;
  */
 
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.nio.file.Path;
 import java.nio.file.Files;
-import java.io.BufferedReader;
-import java.util.TreeMap;
+
 
 public class RIMainFrame extends javax.swing.JFrame {
 
@@ -172,7 +171,6 @@ public class RIMainFrame extends javax.swing.JFrame {
             //C:\Users\skuch\Documents\NetBeansProjects\ReSolve-It\src\main\java\ReSolve\It\source-copies
             File file = fileChooser.getSelectedFile();
             File fileCopy = new File("src\\main\\java\\ReSolve\\It\\source-copies\\source.java");
-            copyPath = fileCopy.toPath();
             try
             {   //This is where we choose what to do with the file (e.g. display in text area, store location)
                 Files.copy(file.toPath(), fileCopy.toPath());
@@ -187,7 +185,9 @@ public class RIMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_openFileActionPerformed
 
     private void removeTextFromFunctions(File file)throws Exception{
-        BufferedReader br = new BufferedReader(new FileReader(file));
+        //Open IO tools
+        FileReader fr = new FileReader(file);
+        BufferedReader br = new BufferedReader(fr);
         File sourceCopy = new File("src\\main\\java\\ReSolve\\It\\source-copies\\sourceCopy.java" );
         FileWriter fw = new FileWriter(sourceCopy);
         
@@ -205,17 +205,27 @@ public class RIMainFrame extends javax.swing.JFrame {
             if( line.contains("{") ) bracketNum++;
             lineNum++;
         }
-        fw.flush();
-        fw.close();
+        fw.flush(); //Flush FileWriter
+        fw.close(); //Close FileWriter
+        br.close(); //Close BufferedReader
+        fr.close(); //Close FileReader
+        fr = null;
+        
+        //Set necessary variables
         sourceCodeCopy = sourceCopy;
-        codeEditorPane.read(new FileReader(sourceCopy.getAbsolutePath()), null);
+        fr = new FileReader(sourceCopy.getAbsolutePath());
+        codeEditorPane.read(fr, null);
+        fr.close();
+        fileCurrentlyInEditor = 1;
     }
     
     private void ExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExitActionPerformed
-        try{
-            Files.delete(copyPath);
+        //Try to delete files from \source-copies, prevents crashing when attempting to run the program at later times
+        try{  
+            sourceCode.delete();
+            sourceCodeCopy.delete();
         }catch(Exception e){
-            System.exit(0);
+            codeEditorPane.setText("Awkward... I couldn't delete the files!");
         }
         System.exit(0);
     }//GEN-LAST:event_ExitActionPerformed
@@ -223,16 +233,20 @@ public class RIMainFrame extends javax.swing.JFrame {
     private void showOriginalCodeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showOriginalCodeButtonActionPerformed
         //If the skeleton code is currently in the editor, then switch to source code
         if(fileCurrentlyInEditor == 1){
+            /* Any FileReaders opened must be closed!!! */
             //Saves the code currently in the editor (because it is the skeleton code the user is writing
-            //Opens the source code
             try{
                 FileWriter fw = new FileWriter(sourceCodeCopy.getAbsolutePath());
                 codeEditorPane.write(fw);
+                fw.close();
             }catch(Exception e){
                 e.printStackTrace();
             }
+            //Opens the source code
             try{
-                codeEditorPane.read(new FileReader(sourceCode.getAbsolutePath()), null);
+                FileReader fr = new FileReader(sourceCode.getAbsolutePath());
+                codeEditorPane.read(fr, null);
+                fr.close();
                 fileCurrentlyInEditor = 0;
             }catch(Exception e){
                 e.printStackTrace();
@@ -241,12 +255,16 @@ public class RIMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_showOriginalCodeButtonActionPerformed
 
     private void showSkeletonCodeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showSkeletonCodeButtonActionPerformed
+        /* Any FileReaders opened must be closed!!! */
         /* If the file currently in editor is the skeleton code, we do not want to reopen it,
            would cause us to lose work */
         if(fileCurrentlyInEditor == 0){
             //Does NOT save the code currently in the editor (because it is currently the source code)
             try{
-                codeEditorPane.read(new FileReader(sourceCodeCopy.getAbsolutePath()), null);
+                //Set codeEditorPane to show the skeletonCode
+                FileReader fr = new FileReader(sourceCodeCopy.getAbsolutePath());
+                codeEditorPane.read(fr, null);
+                fr.close();
                 fileCurrentlyInEditor = 1;
             }catch(Exception e){
                 //Todo: Handle these exceptions better :)
@@ -254,17 +272,6 @@ public class RIMainFrame extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_showSkeletonCodeButtonActionPerformed
-    
-    /*private void clearSourceCopies()
-    {
-        //Need to delete all files copied at the end of execution, else
-        //could crash program on next startup
-        
-        copyPath.
-        for( File file: copyLocation.) 
-            
-        
-    }*/
     
     /**
      * @param args the command line arguments
@@ -304,8 +311,7 @@ public class RIMainFrame extends javax.swing.JFrame {
     //Global variables
     private File sourceCode, sourceCodeCopy;
     private String fileLocation;
-    private int fileCurrentlyInEditor = 0; //0 = Source Code, or nothing
-    private Path copyPath;
+    private int fileCurrentlyInEditor = 0; //0 = Source Code (or nothing), 1 = source copy
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem Exit;
